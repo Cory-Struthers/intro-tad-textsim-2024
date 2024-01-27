@@ -430,7 +430,7 @@ t.test(all_pairs_ss$similarity, all_pairs_tob$similarity)
 ### Homework
 
 #### Discussion Question: 
-See question 3 below.
+See question 4 below.
 
 \
 
