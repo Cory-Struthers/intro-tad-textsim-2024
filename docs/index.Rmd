@@ -40,6 +40,8 @@ library(comperes)
 library(readxl)
 library(igraph)
 library(tidytext)
+library(grid) # additional package! (for figure)
+library(gridExtra) # additional package! (for figure)
 
 options("scipen"=100, "digits"=4)
 
@@ -181,7 +183,7 @@ exp_dist = textstat_dist(exp_dfm, method = "euclidean")
 print(exp_dist)
 
 ```
-When document lengths were short, position2 and postion4 were least distant than all other pairs (3.00). Now, those positions are more distant (5.10) than two other pairs.
+When document lengths were short, position2 and postion4 were least distant than all other pairs (3.00). Now, position2 and position4 are _more_ distant than position1-position2 and position3-position2.
 
 Let's try cosine similarity, which normalizes for document length.
 
@@ -192,7 +194,7 @@ exp_simil = textstat_simil(exp_dfm, method="cosine")
 print(exp_simil)
 
 ```
-Likewise, position2 and position4 were more similar than all other pairs (0.309). Like Euclidean distance, the value has changed, but not as much. Now, those positions (0.227) are less similar than one other pair.
+Likewise, position2 and position4 were more similar than all other pairs (0.309). Like Euclidean distance, the value has changed, but not as much. Now, position2 and position4 are still more similar than position1-position2 and position3-position2.
 
 \
 
@@ -223,7 +225,7 @@ head(news_cols, 20)
 
 # Incorporate collocations into dfm toks
 news_dfm =  tokens_compound(news_toks, news_cols, concatenator = " ") %>%
-    tokens_wordstem ()%>% # stem words after adding collocations
+    tokens_wordstem () %>% # stem words after adding collocations
     dfm(tolower = TRUE)  %>% 
     dfm_trim(min_termfreq = 10, min_docfreq = 10)  
 
@@ -341,7 +343,7 @@ news_dfm_sources_issue = dfm_group(news_dfm, groups = interaction(Source, keywor
 ndoc(news_dfm_sources_issue) # 79 groups
 
 # Cosine similarity 
-news_source_issue_cos_sim = as.dist(textstat_simil(news_dfm_sources_issue, method = "cosine", margin="documents")) 
+news_source_issue_cos_sim = textstat_simil(news_dfm_sources_issue, method = "cosine", margin="documents")
 
 ```
 
@@ -406,22 +408,19 @@ Finally, we can compare distributions and run a t-test to evaluate statistical s
 
 ```{r, message=FALSE}
 
-library(grid)
-library(gridExtra)
-
 p1 = ggplot(all_pairs_tob, aes(x=similarity)) +
     geom_density() +
-    ggtitle("Similarity Across Tobacco Article Sources") +
+    ggtitle("Similarity, Tobacco Sources") +
     xlim(0,1)
 
 p2 = ggplot(all_pairs_ss, aes(x=similarity)) +
     geom_density() +
-    ggtitle("Similarity Across Same-Sex Article Sources") +
+    ggtitle("Similarity, Same-Sex Sources") +
     xlim(0,1)
 
 grid.arrange(p1, p2, ncol=2)
 
-t.test(all_pairs_ss$similarity, all_pairs_tob$similarity)
+t.test(all_pairs_tob$similarity, all_pairs_ss$similarity)
 
 ```
 
