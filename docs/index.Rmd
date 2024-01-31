@@ -214,7 +214,7 @@ news_toks = news_corp %>%
     quanteda::tokens(remove_punct = TRUE,
            remove_numbers = TRUE, 
            remove_symbols = TRUE) %>%
-  tokens_remove(stopwords("en")) # remove stopwords in tokens
+  tokens_remove(pattern = stopwords("en")) # remove stopwords in tokens
 
 # Identify capitalized collocations
 news_cols = tokens_select(news_toks, pattern = "^[A-Z]", 
@@ -237,7 +237,7 @@ textstat_frequency(news_dfm) %>%
 
 Conceivably, we might be interested in whether stories produced by similar outlets utilize more or less similar terms. We can group our dfm by "Source" to explore support for this premise. Like we've done in prior modules, we can group the dfm by source and then use `textstat_dist` to first compare the pairwise euclidean distance of the 14 sources in our corpus.
 
-`quanteda` offers an option for easy and useful visualization of distance scores, particularly when grouped. After grouping the dfm and calculating euclidean distance across all pairs, we can visualize similarity scores across texts by different news sources using `hclust`, which is part of base R. `hclust` conducts hierarchical cluster analysis on the (dis)similiarities of the objects (in our case, texts by different media sources). As shown below, we add the `dist` function to convert the object to an object compatible with `hclust` to create the dendogram.
+`quanteda` offers an option for easy and useful visualization of distance scores, particularly when grouped. After grouping the dfm and calculating euclidean distance across all pairs, we can visualize similarity scores across texts by different news sources using `hclust`, which is part of base R. `hclust` conducts hierarchical cluster analysis on the (dis)similiarities of the objects (in our case, texts by different media sources). As shown below, we add the `dist` function to convert the object to an object compatible with `hclust` to create the dendrogram.
 
 ```{r, message=FALSE}
 
@@ -264,7 +264,7 @@ Note that the left-right orientation is irrelevant and that dendrograms cannot t
 
 # Plot dendrogram
 ggdendrogram(news_source_clust, rotate = TRUE) +
-  labs( xlab="Distance", title="Dendogram of News Articles by Source, Euclidean Distance")
+  labs( xlab="Distance", title="Dendrogram of News Articles by Source, Euclidean Distance")
 
 ```
 
@@ -316,7 +316,7 @@ news_source_cos_dist_clust = hclust(as.dist(apply(news_source_cos_sim, 1, functi
 
 # Plot
 ggdendrogram(news_source_cos_dist_clust, rotate = TRUE) +
-  labs( xlab="Similarity", title="Dendogram of News Articles by Source, Cosine Dissimilarity")
+  labs( xlab="Similarity", title="Dendrogram of News Articles by Source, Cosine Dissimilarity")
 ```
 
 At first glance, patterns seem to be pretty different. But let's examine the sources we examined earlier. Like Euclidean distance, the New York Times and Washington Post are occupying the same branch. Unlike Euclidean distance, the leaves are the smallest in the dendrogram, which suggests these two sources have the least dissimilarity (i.e., the greatest similarity). We again observe clustering among St Petersburg Times and Palm Beach Post, but Tampa Bay Times is unique from these and the most dissimilar to the remaining sources. 
